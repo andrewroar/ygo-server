@@ -107,8 +107,9 @@ const getAllCustomCards = async (_, res) => {
   }
 };
 
-const getOneCustomCards = async (_, res) => {
+const getOneCustomCards = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   try {
     const customcards = await db.CustomCards.findById(id);
 
