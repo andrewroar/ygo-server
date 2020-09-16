@@ -6,6 +6,7 @@ const db = require("../models");
 const GOOGLE_URL = "https://www.googleapis.com/books/v1/volumes";
 
 const apiRouter = express.Router();
+const bcrypt = require("bcrypt");
 
 //API
 
@@ -127,7 +128,14 @@ const AddCustomCards = async (req, res) => {
   try {
     const payload = req.body;
 
-    await db.CustomCards.create(payload);
+    await db.CustomCards.create({
+      name: payload.name,
+      type: payload.type,
+      race: payload.race,
+      vote: payload.vote,
+      password: await bcrypt.hash(payload.password, 10),
+      description: payload.description,
+    });
 
     res.json({
       success: true,
@@ -157,16 +165,20 @@ const VoteCard = async (req, res) => {
 const removeCard = async (req, res) => {
   try {
     const { id } = req.params;
+    const customcards = await db.CustomCards.findById(id);
+    const { password } = req.body;
 
-    await db.CustomCards.findByIdAndDelete(id);
-
-    res.json({
-      success: true,
-    });
+    const validPassword = await bcrypt.compare(password, customcards.password);
+    console.log(validPassword);
+    if (validPassword) {
+      await db.CustomCards.findByIdAndDelete(id);
+      res.json({
+        success: true,
+      });
+    } else {
+    }
   } catch (error) {
-    res.status(500).json({
-      error: error.message,
-    });
+    res.status(200);
   }
 };
 
