@@ -176,6 +176,10 @@ const removeCard = async (req, res) => {
         success: true,
       });
     } else {
+      res.status(401).json({
+        success: false,
+        message: "Failed user authentication",
+      });
     }
   } catch (error) {
     res.status(200);
